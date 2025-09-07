@@ -1,9 +1,6 @@
 package com.dmm.task;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -49,21 +46,12 @@ public class TaskController {
 	@PostMapping("/main/create")
 	public String create(@Validated TaskForm taskForm, BindingResult bindingResult,
 			@AuthenticationPrincipal AccountUserDetails user, Model model) {
-		// バリデーションの結果、エラーがあるかどうかチェック
-		if (bindingResult.hasErrors()) {
-			// エラーがある場合は投稿登録画面を返す
-			List<Tasks> list = repo.findAll(Sort.by(Sort.Direction.DESC, "id"));
-			model.addAttribute("tasks", list);
-			model.addAttribute("taskForm", taskForm);
-			return "create";
-		}
-
 		Tasks task = new Tasks();
 		task.setName(user.getName());
 		task.setTitle(taskForm.getTitle());
 		task.setText(taskForm.getText());
-		task.setDate(taskForm.getDate());
-
+		task.setDate(taskForm.getDate().atStartOfDay());
+		task.setDone(false);
 		repo.save(task);
 
 		return "redirect:/main";
