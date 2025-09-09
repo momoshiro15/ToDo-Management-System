@@ -1,13 +1,18 @@
 package com.dmm.task;
 
+import java.time.LocalDate;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.dmm.task.data.entity.Tasks;
 import com.dmm.task.data.repository.TasksRepository;
@@ -19,23 +24,10 @@ public class TaskController {
 	@Autowired
 	private TasksRepository repo;
 
-	/**
-	 * 投稿の一覧表示.
-	 * 
-	 * @param model モデル
-	 * @return 遷移先
-	 */
-//	@PostMapping("/main")
-//	public String posts(Model model) {
-//		// 逆順で投稿をすべて取得する
-//		List<Tasks> list = repo.findAll(Sort.by(Sort.Direction.DESC, "id"));
-////    Collections.reverse(list); //普通に取得してこちらの処理でもOK
-//		model.addAttribute("posts", list);
-//		TaskForm postForm = new TaskForm();
-//		model.addAttribute("postForm", postForm);
-//		return "main";
-//	}
-
+	@GetMapping("/main/create/{date}")
+	public String register() {
+		return "create";
+	}
 	/**
 	 * 投稿を作成.
 	 * 
@@ -63,10 +55,41 @@ public class TaskController {
 	 * @param id 投稿ID
 	 * @return 遷移先
 	 */
-	@PostMapping("/posts/delete/{id}")
+	@PostMapping("/main/delete/{id}")
 	public String delete(@PathVariable Integer id) {
 		repo.deleteById(id);
 		return "redirect:/main";
 	}
+	
+	@GetMapping("/main/edit/{id}")
+	public String edit(@PathVariable("id") Integer id, Model model) {
+		Tasks task = repo.findById(id)
+		        .get();
+
+		    // ビューに渡す
+		    model.addAttribute("task", task);
+
+		return "edit";
+	}
+	
+	@PostMapping("/main/edit/{id}")
+	public String update(@PathVariable("id")Integer id,
+            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam("title") String title,
+            @RequestParam("text") String text,
+            @RequestParam(value = "done", defaultValue = "false") boolean done) {
+		Tasks task = repo.findById(id)
+		        .get();
+
+		        task.setDate(date.atStartOfDay()); 
+		        task.setTitle(title);
+		        task.setText(text);
+		        task.setDone(done);
+
+		        repo.save(task); 
+
+		return "redirect:/main";
+	}
+
 
 }
