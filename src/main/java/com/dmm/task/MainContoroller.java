@@ -69,6 +69,14 @@ public class MainContoroller {
         }
 
         model.addAttribute("tasks", taskMap);
+        String formattedMonth = firstDay.getYear() + "年" + firstDay.getMonthValue() + "月";
+        model.addAttribute("month", formattedMonth);
+
+        // 4. 前月と翌月のLocalDateを計算してモデルに追加
+        LocalDate prevMonth = firstDay.minusMonths(1);
+        LocalDate nextMonth = firstDay.plusMonths(1);
+        model.addAttribute("prev", prevMonth);
+        model.addAttribute("next", nextMonth);
 		return "main";
 	}
 	
