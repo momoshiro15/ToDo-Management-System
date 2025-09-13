@@ -66,7 +66,7 @@ public class MainContoroller {
         LocalDateTime from = firstDay.atStartOfDay();
         LocalDateTime to = lastDay.atTime(23, 59, 59);
         List<Tasks> taskList = 
-        		Objects.equals(user.getUsername(), "admin") ?repo.findAllByDateBetween(from, to):repo.findByDateBetween(from, to, user.getName());
+        		Objects.equals(user.getUsername(), "admin") ?repo.findAllByDateBetween(start.atStartOfDay(), end.atStartOfDay()):repo.findByDateBetween(start.atStartOfDay(), end.atStartOfDay(),user.getName());
         
         // -------------------------
         //  タスクを LocalDate ごとに分類
