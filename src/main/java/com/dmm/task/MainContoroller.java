@@ -5,8 +5,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,11 +25,17 @@ public class MainContoroller {
 	@Autowired
 	private TasksRepository repo;
 	@GetMapping("/main")
-	public String showCalender(@RequestParam(defaultValue = "#{T(java.time.LocalDate).now().year}") int year,
-            @RequestParam(defaultValue = "#{T(java.time.LocalDate).now().monthValue}") int month,
-            @AuthenticationPrincipal AccountUserDetails user,
-            Model model) {
+	public String showCalender( @RequestParam(value = "date", required = false)
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+    @AuthenticationPrincipal AccountUserDetails user,
+    Model model) {
 		
+		if (date == null) {
+	        date = LocalDate.now();
+	    }
+
+	    int year = date.getYear();
+	    int month = date.getMonthValue();
 		 // カレンダーの2次元日付リスト
         List<List<LocalDate>> matrix = new ArrayList<>();
         LocalDate firstDay = LocalDate.of(year, month, 1);
@@ -57,8 +65,9 @@ public class MainContoroller {
 
         LocalDateTime from = firstDay.atStartOfDay();
         LocalDateTime to = lastDay.atTime(23, 59, 59);
-        List<Tasks> taskList = repo.findByDateBetween(from, to, user.getName());
-
+        List<Tasks> taskList = 
+        		Objects.equals(user.getUsername(), "admin") ?repo.findAllByDateBetween(from, to):repo.findByDateBetween(from, to, user.getName());
+        
         // -------------------------
         //  タスクを LocalDate ごとに分類
         // -------------------------

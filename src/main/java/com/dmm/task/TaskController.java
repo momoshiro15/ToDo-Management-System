@@ -25,7 +25,9 @@ public class TaskController {
 	private TasksRepository repo;
 
 	@GetMapping("/main/create/{date}")
-	public String register() {
+	public String register(Model model,
+			@PathVariable("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+		model.addAttribute("date", date);
 		return "create";
 	}
 	/**

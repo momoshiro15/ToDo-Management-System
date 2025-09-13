@@ -16,4 +16,9 @@ public interface TasksRepository extends JpaRepository<Tasks, Integer> {
 	        @Param("to") LocalDateTime to,
 	        @Param("name") String name
 	    );
+	 @Query("SELECT a FROM Tasks a WHERE a.date BETWEEN :from AND :to")
+	    List<Tasks> findAllByDateBetween(
+	        @Param("from") LocalDateTime from,
+	        @Param("to") LocalDateTime to
+	    );
 }
