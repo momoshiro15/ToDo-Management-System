@@ -2,7 +2,6 @@ package com.dmm.task;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -62,9 +61,6 @@ public class MainContoroller {
         }
 
         model.addAttribute("matrix", matrix);
-
-        LocalDateTime from = firstDay.atStartOfDay();
-        LocalDateTime to = lastDay.atTime(23, 59, 59);
         List<Tasks> taskList = 
         		Objects.equals(user.getUsername(), "admin") ?repo.findAllByDateBetween(start.atStartOfDay(), end.atStartOfDay()):repo.findByDateBetween(start.atStartOfDay(), end.atStartOfDay(),user.getName());
         
